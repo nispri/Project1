@@ -1,4 +1,4 @@
-name: Build
+name: Build,Analyze,scan
 
 on:
   push:
@@ -7,14 +7,35 @@ on:
 
 
 jobs:
-  build:
+  build-analyze-scan:
     name: Build
-    runs-on: self-hosted
+    runs-on: [self-hosted]
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - uses: sonarsource/sonarqube-scan-action@master
+
+      - name: Build and analyze with SonarQube
+        uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          
+      - name: npm install dependency
+        run: npm install
+
+      - name: Trivy file scan
+        run: trivy fs . > trivyfs.txt
+
+      - name: Docker Build and push
+        run: |
+          docker build -t node-api .
+          docker tag node-api nispri/node-api:latest
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+          docker push nispri/node-api:latest
+        env:
+          DOCKER_CLI_ACI: 1
+
+      - name: Image scan
+        run: trivy image nispri/node-api:latest > trivyimage.txt
