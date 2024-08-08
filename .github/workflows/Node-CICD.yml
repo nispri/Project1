@@ -39,3 +39,16 @@ jobs:
 
       - name: Image scan
         run: trivy image nispri/node-api:latest > trivyimage.txt
+  
+  deploy:
+   needs: build-analyze-scan   
+   runs-on: [self-hosted]
+   steps:
+      - name: docker pull image
+        run: docker pull nispri/node-api:latest
+
+      - name: Image scan
+        run: trivy image nispri/node-api:latest > trivyimagedeploy.txt  
+  
+      - name: Deploy to container
+        run: docker run -d --name node-api -p 3000:3000 nispri/node-api:latest
