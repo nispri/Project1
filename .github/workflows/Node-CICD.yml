@@ -48,11 +48,25 @@ jobs:
         run: docker pull nispri/node-api:latest
 
       - name: Image scan
-        run: trivy image nispri/node-api:latest > trivyimagedeploy.txt  
-  
+        run: trivy image nispri/node-api:latest > trivyimagedeploy.txt
+      
       - name: Deploy to container
-        run: docker run -d --name node-api -p 3000:3000 nispri/node-api:latest
-        
+        run: |
+          # Check if the container is already running
+          if [ "$(docker ps -q -f name=node-api)" ]; then
+            echo "Stopping and removing the existing container..."
+            docker stop node-api
+            docker rm node-api
+          elif [ "$(docker ps -aq -f status=exited -f name=node-api)" ]; then
+            echo "Removing the stopped container..."
+            docker rm node-api
+          else
+            echo "No existing container found, deploying a new one..."
+          fi
+    
+          # Deploy the new container
+          docker run -d --name node-api -p 3000:3000 nispri/node-api:latest
+          
       - name: Update kubeconfig
         run: aws eks --region ap-south-1 update-kubeconfig --name EKS_CLOUD
 
