@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/test', (req, res) => {
-    res.send('Hello TEST!')
+    res.send('Hello TEST...!')
   })
 
 app.get('/print', (req, res) => {
