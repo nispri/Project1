@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: gnode-api.local
+  - host: node-api.local
     http:
       paths: 
       - path: /
