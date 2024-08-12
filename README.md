@@ -21,3 +21,11 @@ docker start sonar
 docker stop node-api
 docker rm node-api
 
+
+References:
+GitHub: https://github.com/Aj7Ay/TIC-TAC-TOE.git
+YouTube video for this project: youtu.be/FghkK2hFd1k
+EKS Video: https://youtu.be/5-PZnYaoZUM
+
+Documentation: 
+https://mrcloudbook.com/github-actions-tic-tac-toe-game/
